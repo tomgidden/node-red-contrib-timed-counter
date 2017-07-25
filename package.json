@@ -1,22 +1,33 @@
 {
-    "name": "node-red-contrib-timed-counter",
-    "version": "0.0.1",
-    "description": "Node-RED node for detecting repeat messages, double-clicks, etc.",
-    "dependencies": {},
-    "author": {
-        "name": "Tom Gidden",
-        "email": "tom@gidden.net"
-    },
-    "license": "ISC",
-    "keywords": [
-        "repeat",
-        "click",
-        "double-click",
-        "timing"
-    ],
-    "node-red": {
-        "nodes": {
-            "timed-counter": "timed-counter.js"
-        }
-    }
+   "name" : "node-red-contrib-timed-counter",
+   "description" : "A Node-RED node that counts messages received in a specified time limit",
+   "keywords" : [
+      "repeat",
+      "counter",
+      "timed",
+      "click",
+      "double-click",
+      "timing"
+   ],
+   "version" : "0.0.1",
+   "license" : "ISC",
+
+   "homepage" : "https://github.com/tomgidden/node-red-contrib-timed-counter#readme",
+   "author" : {
+      "name" : "Tom Gidden",
+      "email" : "tom@gidden.net"
+   },
+   "bugs" : {
+      "url" : "https://github.com/tomgidden/node-red-contrib-timed-counter/issues"
+   },
+   "repository" : {
+      "type" : "git",
+      "url" : "git+https://github.com/tomgidden/node-red-contrib-timed-counter.git"
+   },
+   "dependencies" : {},
+   "node-red" : {
+      "nodes" : {
+         "timed-counter" : "timed-counter.js"
+      }
+   }
 }

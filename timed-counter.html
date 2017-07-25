@@ -40,5 +40,13 @@
 </script>
 
 <script type="text/x-red" data-help-name="timed-counter">
-    <p>A node that counts messages received in a specified time limit</p>
+  <p>A node that counts messages received in a specified time limit.</p>
+
+  <p>This node counts incoming messages while they are received in a configured time limit.  When the first message comes in, a countdown timer is started.  When subsequent messages arrive within the time limit the counter is incremented, so the first message gets `msg.count == 1`, the next `msg.count == 2`, and so on.  When the time limit is reached, the counter is reset.</p>
+
+  <p>It can be configured in a couple of different ways.  Firstly, it can be programmed with a fixed timeout, so it only counts within a time limit from the first message received (in a chain). Alternatively, a non-fixed timeout will result in each subsequent message resetting the time limit but not the counter; so if messages continue to be received by a certain frequency, the timer will be restarted but the count kept.  This allows messages to be counted without limit, as long as they keep coming in fast enough.</p>
+
+  <p>The other configuration choice is whether to allow the messages to come through (with their counts added) as they are received, or whether to withhold them and just send the last one.  This is to allow for a single message to represent all of the messages in a chain.  For example, if detecting a double- or triple-click of a button to determine an alternative function, the first click might not be desired if immediately followed by a second click.</p>
+
+  <p>So, for a typical mouse single-, double- and triple-click detector, set the time limit to <i>350</i> milliseconds or so, untick <i>"Fixed timeout"</i>, and tick <i>"Final message only"</i>.  The message that is eventually received will have a `msg.count` value equal to <i>1, 2, 3,</i> or more.  A <i>switch</i> node or a <i>function</i> node may be used to decide how to process them.</p>
 </script>
