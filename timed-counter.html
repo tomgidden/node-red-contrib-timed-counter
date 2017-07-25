@@ -1,0 +1,44 @@
+<script type="text/javascript">
+    RED.nodes.registerType('timed-counter',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""},
+            timelimit: {value:350},
+            withhold: {value:true},
+            fixedtimeout: {value:false}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"timed-counter";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="timed-counter">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-timelimit"><i class="fa fa-clock"></i> Time limit (milliseconds)</label>
+        <input type="text" id="node-input-timelimit">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-fixedtimeout"><i class="fa fa-tachometer"></i> Fixed timeout</label>
+        <input type="checkbox" id="node-input-fixedtimeout">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-withhold"><i class="fa fa-stop-circle"></i> Final message only</label>
+        <input type="checkbox" id="node-input-withhold">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="timed-counter">
+    <p>A node that counts messages received in a specified time limit</p>
+</script>
