@@ -9,6 +9,14 @@ module.exports = function(RED) {
         node.fixedtimeout = !!config.fixedtimeout;
 
         node.on('input', function(msg) {
+            // message with property "msg.reset" resets the timer and counter
+            if( msg.hasOwnProperty("reset") && msg.reset ) {
+                node.count = 0;
+                msg.count = node.count;
+                // node.warn('reset.');
+                node.buffer = undefined;
+                node.send(msg);
+            } else {
             if (undefined === node.timeout) {
                 // Reset the count
                 node.count = 1;
@@ -64,6 +72,7 @@ module.exports = function(RED) {
                 // message, and just send the last one when the timer
                 // finally expires.
                 node.buffer = msg;
+            }
             }
         });
     }
