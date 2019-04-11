@@ -5,6 +5,7 @@
         defaults: {
             name: { value:"" },
             timelimit: { value:350 },
+            timeunit: { value:1 },
             withhold: { value:true },
             fixedtimeout: { value:false },
             pertopic: { value:false }
@@ -25,8 +26,14 @@
     </div>
 
     <div class="form-row">
-        <label for="node-input-timelimit"><i class="fa fa-clock"></i> Time limit (milliseconds)</label>
-        <input type="text" id="node-input-timelimit">
+        <label for="node-input-timelimit"><i class="fa fa-clock"></i> Time limit</label>
+        <input type="text" id="node-input-timelimit" style="width:24%">
+        <select style="width:24%" id="node-input-timeunit">
+          <option value=       1 selected>Milliseconds</option>
+          <option value=    1000>Seconds</option>
+          <option value=   60000>Minutes</option>
+          <option value= 3600000>Hours</option>
+        </select>
     </div>
 
     <div class="form-row">

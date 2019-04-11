@@ -6,7 +6,7 @@ module.exports = function(RED) {
         var node = this;
 
         // Milliseconds for the timeout
-        node.timelimit = parseInt(config.timelimit);
+        node.timelimit = parseInt(config.timelimit) * config.timeunit;
 
         // Should we only send the final message at the end of the
         // timeout, or send them all as they arrive but tagged with count?
