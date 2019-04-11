@@ -49,4 +49,6 @@
   <p>The other configuration choice is whether to allow the messages to come through (with their counts added) as they are received, or whether to withhold them and just send the last one.  This is to allow for a single message to represent all of the messages in a chain.  For example, if detecting a double- or triple-click of a button to determine an alternative function, the first click might not be desired if immediately followed by a second click.</p>
 
   <p>So, for a typical mouse single-, double- and triple-click detector, set the time limit to <code>350</code> milliseconds or so, untick <i>"Fixed timeout"</i>, and tick <i>"Final message only"</i>.  The message that is eventually received will have a <code>msg.count</code> value equal to <code>1</code>, <code>2</code>, <code>3</code>, or more.  A <i>switch</i> node or a <i>function</i> node may be used to decide how to process them.</p>
+
+  <p>If a message with <code>msg.reset</code> set, then the timer and count will be reset.  If <i>"Final message only"</i> is set, this reset message will be lost; if it isn't set then the reset message will flow through.</p>
 </script>

@@ -9,22 +9,33 @@ module.exports = function(RED) {
         node.fixedtimeout = !!config.fixedtimeout;
 
         node.on('input', function(msg) {
-            // message with property "msg.reset" resets the timer and counter
-            if( msg.hasOwnProperty("reset") && msg.reset ) {
-                node.count = 0;
-                msg.count = node.count;
-                // node.warn('reset.');
+
+            // If the message has a 'reset' property, reset the timer and the count.
+            if (undefined !== msg.reset) {
+                msg.count = node.count = 0;
                 node.buffer = undefined;
-                node.send(msg);
-            } else {
-            if (undefined === node.timeout) {
-                // Reset the count
-                node.count = 1;
-                // And store the message
-                msg.count = node.count;
+
+                // Clear any running timer
+                if (undefined !== node.timeout) {
+                    clearTimeout(node.timeout);
+                    node.timeout = undefined;
+                }
+
+                // This will NOT start the timer, as otherwise we'd get
+                // the reset message passed through if no other things
+                // arrive.  If we're withholding, this means the reset
+                // message will disappear; if we're not withholding, then
+                // the reset message will flow through.
             }
             else {
-                if (! this.fixedtimeout) {
+                // Normal message received (not a reset)
+
+                // If we have no timeout, start the process...
+                if (undefined === node.timeout) {
+                    // Reset the count
+                    msg.count = node.count = 0;
+                }
+                else if (! this.fixedtimeout) {
                     // If fixedtimeout is false, then each time a message
                     // is received within the timeout, the timeout is
                     // reset. So, if the timeout is 2 seconds, and a
@@ -39,40 +50,43 @@ module.exports = function(RED) {
 
                 // Increment the count
                 node.count ++;
-                // And store the message
+                // And store in the message
                 msg.count = node.count;
+
+                if (undefined === node.timeout) {
+                    // Now, if the timeout is unset (as earlier) or the
+                    // !fixedtimeout check has invalidated the last one, then
+                    // set it again.  (If not, the existing one should still be valid.)
+
+                    node.timeout = setTimeout(function () {
+                        // First things first: clear the timeout properly.
+                        node.timeout = undefined;
+
+                        // Now, if we are withholding message(s) until expiry,
+                        // we need to finally dispatch.
+                        if (node.buffer) {
+                            node.send(node.buffer);
+                            node.buffer = undefined;
+                        }
+                    }, this.timelimit);
+                }
             }
 
-            if (undefined === node.timeout) {
-                // Now, if the timeout is unset (as earlier) or the
-                // !fixedtimeout check has invalidated the last one, then
-                // set it again.  (If not, the existing one should still be valid.)
+            // At this point, we may have either a reset message with
+            // count=0 and no timeout, or we'll have a real message with a
+            // count > 0 and there should be a timeout running.
 
-                node.timeout = setTimeout(function () {
-                    // First things first: clear the timeout properly.
-                    node.timeout = undefined;
-
-                    // Now, if we are withholding message(s) until expiry,
-                    // we need to finally dispatch.
-                    if (node.buffer) {
-                        node.send(node.buffer);
-                        node.buffer = undefined;
-                    }
-                }, this.timelimit);
-            }
-
-            if (! this.withhold ) {
-                // If withhold is false, it'll send the messages tagged
-                // with the count immediately as normal: this node will
-                // not impede flow, but just tag the count value.
-                node.send(msg);
-            }
-            else {
-                // Otherwise, it'll store the most recently received
+            if ( this.withhold ) {
+                // If withholding, store the most recently received
                 // message, and just send the last one when the timer
                 // finally expires.
                 node.buffer = msg;
             }
+            else {
+                // If withhold is false, so send the messages tagged with
+                // the count immediately as normal: this node will not
+                // impede flow, but just tag the count value.
+                node.send(msg);
             }
         });
     }
