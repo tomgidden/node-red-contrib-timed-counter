@@ -120,7 +120,6 @@ module.exports = function(RED) {
         var getHandler = function (topic) {
             // If there's no handler for this topic, create one
             if (undefined === handlers[topic]) {
-                node.warn("Creating handler for "+topic);
                 handlers[topic] = TimedCounterHandler();
             }
 
