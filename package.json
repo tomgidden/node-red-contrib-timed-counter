@@ -10,7 +10,7 @@
       "double-click",
       "timing"
    ],
-   "version" : "1.0.0",
+   "version" : "0.1.0",
    "license" : "ISC",
 
    "homepage" : "https://github.com/tomgidden/node-red-contrib-timed-counter#readme",
