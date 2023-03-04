@@ -1,4 +1,4 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
     'use strict';
 
     function TimedCounter(config) {
@@ -19,6 +19,10 @@ module.exports = function(RED) {
         // Should we count messages per topic, or just use a single
         // timer/count for all incoming messages?
         node.pertopic = !!config.pertopic;
+
+        // Should we send the final message once a number of messages have
+        // been received, if not the timeout first?
+        node.countlimit = parseInt(config.countlimit);
 
         var TimedCounterHandler = function () {
             return {
@@ -56,7 +60,7 @@ module.exports = function(RED) {
                             // Reset the count
                             msg.count = handler.count = 0;
                         }
-                        else if (! node.fixedtimeout) {
+                        else if (!node.fixedtimeout) {
                             // If fixedtimeout is false, then each time a message
                             // is received within the timeout, the timeout is
                             // reset. So, if the timeout is 2 seconds, and a
@@ -70,11 +74,27 @@ module.exports = function(RED) {
                         }
 
                         // Increment the count
-                        handler.count ++;
+                        handler.count++;
                         // And store in the message
                         msg.count = handler.count;
 
-                        if (undefined === handler.timeout) {
+                        if (!isNaN(node.countlimit) && node.countlimit > 0 && handler.count >= node.countlimit) {
+                            // If we have a count limit, and we've reached it,
+                            // then clear the timeout and send the message.
+
+                            // Clear any running timer
+                            if (undefined !== handler.timeout) {
+                                clearTimeout(handler.timeout);
+                                handler.timeout = undefined;
+                            }
+
+                            // and send the message
+                            node.send(msg);
+                            handler.buffer = undefined;
+
+                        }
+
+                        else if (undefined === handler.timeout) {
                             // Now, if the timeout is unset (as earlier) or
                             // the !fixedtimeout check has invalidated the
                             // last one, then set it again.  (If not, the
@@ -99,7 +119,7 @@ module.exports = function(RED) {
                     // count=0 and no timeout, or we'll have a real message
                     // with a count > 0 and there should be a timeout running.
 
-                    if ( node.withhold ) {
+                    if (node.withhold) {
                         // If withholding, store the most recently received
                         // message, and just send the last one when the timer
                         // finally expires.
@@ -128,7 +148,7 @@ module.exports = function(RED) {
         };
 
         // Handle an incoming message
-        node.on('input', function(msg) {
+        node.on('input', function (msg) {
 
             var handler;
             if (node.pertopic) {
@@ -144,5 +164,5 @@ module.exports = function(RED) {
         });
     }
 
-    RED.nodes.registerType("timed-counter",TimedCounter);
+    RED.nodes.registerType("timed-counter", TimedCounter);
 }
