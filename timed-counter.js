@@ -32,6 +32,12 @@ module.exports = function (RED) {
 
                 input: function (msg) {
 
+                    // Load configuration overrides from message, or use configuration as default.
+                    var timelimit = msg.timelimit !== undefined ? msg.timelimit : node.timelimit;
+                    var withhold = msg.withhold !== undefined ? msg.withhold : node.withhold;
+                    var fixedtimeout = msg.fixedtimeout !== undefined ? msg.fixedtimeout : node.fixedtimeout;
+                    var countlimit = msg.countlimit !== undefined ? msg.countlimit : node.countlimit;
+
                     var handler = this;
 
                     // If the message has a 'reset' property, reset the timer and the count.
@@ -60,7 +66,7 @@ module.exports = function (RED) {
                             // Reset the count
                             msg.count = handler.count = 0;
                         }
-                        else if (!node.fixedtimeout) {
+                        else if (!fixedtimeout) {
                             // If fixedtimeout is false, then each time a message
                             // is received within the timeout, the timeout is
                             // reset. So, if the timeout is 2 seconds, and a
@@ -78,7 +84,7 @@ module.exports = function (RED) {
                         // And store in the message
                         msg.count = handler.count;
 
-                        if (!isNaN(node.countlimit) && node.countlimit > 0 && handler.count >= node.countlimit) {
+                        if (!isNaN(countlimit) && countlimit > 0 && handler.count >= countlimit) {
                             // If we have a count limit, and we've reached it,
                             // then clear the timeout and send the message.
 
@@ -111,7 +117,7 @@ module.exports = function (RED) {
                                     node.send(handler.buffer);
                                     handler.buffer = undefined;
                                 }
-                            }, node.timelimit);
+                            }, timelimit);
                         }
                     }
 
@@ -119,7 +125,7 @@ module.exports = function (RED) {
                     // count=0 and no timeout, or we'll have a real message
                     // with a count > 0 and there should be a timeout running.
 
-                    if (node.withhold) {
+                    if (withhold) {
                         // If withholding, store the most recently received
                         // message, and just send the last one when the timer
                         // finally expires.
@@ -151,7 +157,8 @@ module.exports = function (RED) {
         node.on('input', function (msg) {
 
             var handler;
-            if (node.pertopic) {
+            var pertopic = msg.pertopic !== undefined ? msg.pertopic : node.pertopic;
+            if (pertopic) {
                 // Use a handler for each topic
                 handler = getHandler(msg.topic);
             }
